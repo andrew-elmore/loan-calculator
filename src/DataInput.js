@@ -37,10 +37,10 @@ const reducer = (state, action) => {
 
 function DataInput(props) {
     const [state, dispatch] = useReducer(reducer, {
-        loanAmount: null,
+        loanAmount: 5000,
         termYears: null,
-        termMonths: null,
-        interestRate: null
+        termMonths: 60,
+        interestRate: 4.5
     })
     const [duration, setDuration] = useState('Months')
 
@@ -54,7 +54,6 @@ function DataInput(props) {
 
     return (
         <div>
-
 
             <TextField
                 id="standard-basic"
