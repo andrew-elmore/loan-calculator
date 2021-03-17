@@ -6,12 +6,11 @@ import {
   TextField
 } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import { makeStyles } from '@material-ui/core/styles';
 
-import ToggleButton from '@material-ui/lab/ToggleButton'
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import DataInput from './DataInput'
-import PaymentSchedule from './PaymentSchedule'
-import SubsequentPayment from './SubsequentPayment'
+import DataInput from './components/DataInput'
+import PaymentSchedule from './components/PaymentSchedule'
+import SubsequentPayment from './components/SubsequentPayment'
 
 const reducer = (state, action) => {
   Object.freeze(state)
@@ -29,6 +28,18 @@ const reducer = (state, action) => {
         currentState.subsequentPayments[paymentType] = { ...currentState.subsequentPayments[paymentType], ...paymentAction}
       }
       return currentState
+    case 'REMOVE_ONE_TIME_PAYMENT':
+      console.log("REMOVE_ONE_TIME_PAYMENT", action.payload )
+      delete currentState.subsequentPayments['ONE_TIME'][action.payload]
+      return currentState
+    case 'REMOVE_MONTHLY_PAYMENT':
+      console.log("REMOVE_MONTHLY_PAYMENT" )
+      currentState.subsequentPayments['MONTHLY'] = 0
+      return currentState
+      case 'REMOVE_YEARLY_PAYMENT':
+      console.log("REMOVE_YEARLY_PAYMENT", action.payload )
+      delete currentState.subsequentPayments['YEARLY'][action.payload]
+      return currentState
     case 'seeState':
       console.log(state)
     default:
@@ -36,16 +47,35 @@ const reducer = (state, action) => {
   }
 }
 
+
+const useStyles = makeStyles({
+  root: {
+    background: 'red'
+  },
+});
+
 function App() {
+  const classes = useStyles();
   const [state, dispatch] = useReducer(reducer, {
     inputData: {},
     durationType: '',
     subsequentPayments: {
       'ONE_TIME': {},
-      'MONTHLY': {},
+      'MONTHLY': 0,
       'YEARLY': {}
+    },
+    errors: {
+      dataInput: {
+        loanAmount: false,
+        termYears: false,
+        termMonths: false,
+        interestRate: false
+      }
     }
   })
+  const [paymentOpen, setPaymentOpen] = useState(false)
+  const [paymentMonth, setPaymentMonth] = useState(undefined)
+  const [paymentType, setPaymentType] = useState(undefined)
 
   const submitDataInput = (data, durationType) => {
     dispatch({ type: 'CREATE_LOAN', payload: { data, durationType } })
@@ -54,23 +84,58 @@ function App() {
   const addPayment = (paymentType, paymentAction) => {
     dispatch({ type: 'ADD_PAYMENT', payload: { paymentType, paymentAction } })
   }
-
   
+  const togglePaymentOpen = () => {
+    if (paymentOpen){
+      setPaymentMonth(undefined)
+      setPaymentType(undefined)
+    }
+    setPaymentOpen(!paymentOpen)
+  }
+
+  const deleteSubesquentPayment = (type, month) => { 
+    if(type === 'ONE_TIME'){
+      dispatch({ type: 'REMOVE_ONE_TIME_PAYMENT', payload:  month })
+    }else if(type === 'MONTHLY'){
+      dispatch({ type: 'REMOVE_MONTHLY_PAYMENT', payload: 0 })
+    } else{
+      dispatch({ type: 'REMOVE_YEARLY_PAYMENT', payload: month })
+    }
+  }
+
+
+
+
+
+
+
+  const openPaymentToMonth = (paymentMonth) => {
+    setPaymentMonth(paymentMonth)
+    setPaymentType('ONE_TIME')
+    setPaymentOpen(true)
+  }
 
 
   return (
     <div className="App">
+      <button onClick={() => {console.log(state)}}>state</button>
       <DataInput
         submitDataInput={submitDataInput}
       />
-      <button onClick={() => {console.log(state)}}>STATE</button>
       <SubsequentPayment
         addPayment={addPayment}
+        currentSubsequentPayments={state.subsequentPayments}
+        paymentOpen={paymentOpen}
+        togglePaymentOpen={togglePaymentOpen}
+        paymentMonth={paymentMonth}
+        deleteSubesquentPayment={deleteSubesquentPayment}
       />
       <PaymentSchedule
         inputData={state.inputData}
         durationType={state.durationType}
         subsequentPayments={state.subsequentPayments}
+        openPaymentToMonth={openPaymentToMonth}
+        deleteSubesquentPayment={deleteSubesquentPayment}
       />
 
     </div>

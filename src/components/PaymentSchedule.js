@@ -4,27 +4,29 @@ import {
     TextField,
     Grid
 } from '@material-ui/core';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import ToggleButton from '@material-ui/lab/ToggleButton'
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import { makeStyles } from '@material-ui/core/styles';
+import AdditionalPayments from './AdditionalPayments'
+
+
+const useStyles = makeStyles({
+    root: {
+        background: 'red'
+    },
+});
 
 const PaymentSchedule = (props) => {
+    const classes = useStyles();
 
     const [inputData, setInputData] = useState(props.inputData)
     const [subsequentPayments, setSubsequentPayments] = useState(props.subsequentPayments)
 
 
     if (props.inputData !== inputData){
-        console.log('tripped inputData')
         setInputData(props.inputData)
     }
 
-    console.log('props.subsequentPayments', props.subsequentPayments)
-    console.log('subsequentPayments', subsequentPayments)
-    console.log('props.subsequentPayments !== subsequentPayments', props.subsequentPayments !== subsequentPayments)
 
     if (props.subsequentPayments !== subsequentPayments){
-        console.log('tripped subsequentPayments')
         setSubsequentPayments(props.subsequentPayments)
     }
 
@@ -32,22 +34,37 @@ const PaymentSchedule = (props) => {
     let originalPrincipal = inputData.loanAmount
     let principal = originalPrincipal
     let rate = inputData.interestRate / 100
-    let months = inputData.termMonths
+    let numMonths = inputData.termMonths
     let monthlyRate = rate / 12
-    let years = []
+    let months = []
     
     let i = 0 
-    while (i < months) {
-        let mothlyPayment = (originalPrincipal * monthlyRate * ((1 + monthlyRate) ** months)) / (((1 + monthlyRate) ** months) - 1)
-        if (subsequentPayments['ONE_TIME'][i.toString()]){
-            console.log('subPayments', subsequentPayments['ONE_TIME'][i.toString()])
-            mothlyPayment += parseFloat(subsequentPayments['ONE_TIME'][i.toString()])
+    while (i < numMonths || principal > 0) {
+        let mothlyPayment = (originalPrincipal * monthlyRate * ((1 + monthlyRate) ** numMonths)) / (((1 + monthlyRate) ** numMonths) - 1)
+        let additionalPayments = parseFloat(subsequentPayments['MONTHLY'])
+        let aditionalPaymentsComponents = {}
+        if (parseFloat(subsequentPayments['MONTHLY']) > 0){
+            aditionalPaymentsComponents = { ['MONTHLY']: parseFloat(subsequentPayments['MONTHLY'])}
         }
+        if (subsequentPayments['ONE_TIME'][i]){
+            additionalPayments += parseFloat(subsequentPayments['ONE_TIME'][i])
+            aditionalPaymentsComponents['ONE_TIME'] = parseFloat(subsequentPayments['ONE_TIME'][i])
+        }
+        
+        if (subsequentPayments['YEARLY'][(i % 12)]){
+            additionalPayments += parseFloat(subsequentPayments['YEARLY'][(i % 12)])
+            aditionalPaymentsComponents['YEARLY'] = parseFloat(subsequentPayments['YEARLY'][i%12])
+        }
+        
+        mothlyPayment += additionalPayments
+        
+        mothlyPayment = Math.min(principal * (1 + monthlyRate), mothlyPayment)
+
         let interestPayment = (principal * monthlyRate) 
         let principalPayment = (mothlyPayment - interestPayment)
         let remainingPrincipal = (principal - principalPayment)
         principal = remainingPrincipal
-        years.push({ month: i, mothlyPayment, interestPayment, principalPayment, remainingPrincipal})
+        months.push({ numMonth: i, mothlyPayment, interestPayment, principalPayment, remainingPrincipal, additionalPayments, aditionalPaymentsComponents})
         i ++
     }
 
@@ -91,16 +108,33 @@ const PaymentSchedule = (props) => {
     
     return (
         <div>
-            <button
-                onClick={() => { console.log(subsequentPayments)}}
-            >state</button>
             <Grid container spacing={1}>
-                {years.map((year) => {
-                    const { month, mothlyPayment, interestPayment, principalPayment, remainingPrincipal } = year
+                <Grid container item xs={12} spacing={1}>
+                    <Grid container item xs={2} spacing={1}>
+                        Month
+                    </Grid>
+                    <Grid container item xs={2} spacing={1}>
+                        Monthly Payment
+                    </Grid>
+                    <Grid container item xs={2} spacing={1}>
+                        Principal Payment
+                    </Grid>
+                    <Grid container item xs={2} spacing={1}>
+                        Interest Payment
+                    </Grid>
+                    <Grid container item xs={2} spacing={1}>
+                        Remaining Principal
+                    </Grid>
+                    <Grid container item xs={2} spacing={1}>
+                        Additional Payments
+                    </Grid>
+                </Grid>
+                {months.map((month) => {
+                    const { numMonth, mothlyPayment, interestPayment, principalPayment, remainingPrincipal } = month
                     return (
                         <Grid container item xs={12} spacing={1}>
                             <Grid container item xs={2} spacing={1}>
-                                {month}
+                                {numMonth}
                             </Grid>
                             <Grid container item xs={2} spacing={1}>
                                 {makeDollarAmount(mothlyPayment)}
@@ -115,7 +149,11 @@ const PaymentSchedule = (props) => {
                                 {makeDollarAmount(remainingPrincipal)}
                             </Grid>
                             <Grid container item xs={2} spacing={1}>
-
+                                <AdditionalPayments
+                                    month={month}
+                                    openPaymentToMonth={props.openPaymentToMonth}
+                                    deleteSubesquentPayment={props.deleteSubesquentPayment}
+                                />
                             </Grid>
                         </Grid>
                     )
