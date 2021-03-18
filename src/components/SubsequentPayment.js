@@ -2,7 +2,6 @@ import React, { useReducer, useState } from 'react'
 import {
     Button,
     TextField,
-    Grid,
     Dialog,
     Typography,
     DialogContent,
@@ -15,7 +14,53 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
     root: {
-        background: 'red'
+        background: 'white',
+        margin: '2%',
+        marginTop: '0',
+        padding: '3%',
+        boxShadow: '1px 1px 5px grey',
+        alignItems: 'center',
+        display: 'block',
+        height: '100%'
+    },
+    button: {
+        marginTop: 20,
+        borderRadius: 20,
+        boxShadow: '1px 1px 5px grey',
+    },
+    paymentDisplay: {
+        margin: '0.5%',
+        border: '1px solid grey',
+        borderRadius: 20,
+        width: '100%',
+        display: 'inline-block',
+    },
+    paymentDisplayTitle: {
+        background: 'grey',
+        borderTopRightRadius: 20,
+        borderTopLeftRadius: 20,
+        color: 'white',
+        textAlign: 'center',
+        padding: 5        
+    },
+    chipsContainer: {
+        height: 30,
+        padding: 7
+    },
+    dialog: {
+        width: 400,
+        height: 325,
+        alignItems: 'center',
+        display: 'inline-block',
+    },
+    inputs: {
+        width: 400,
+        marginTop: 20
+    },
+    button: {
+        marginTop: 10,
+        borderRadius: 20,
+        boxShadow: '1px 1px 5px grey',
     },
 });
 
@@ -26,6 +71,8 @@ const SubsequentPayment = (props) => {
         month: props.paymentMonth || 0,
         amount: 0
     })
+
+    if (!props.inputData.loanAmount) { return null }
 
     
     if (paymentDetails.month !== props.paymentMonth && props.paymentMonth !== undefined){
@@ -55,9 +102,10 @@ const SubsequentPayment = (props) => {
 
     const oneTimeDisplay = () => {
         return (
-            <div>
+            <div >
                 <Typography>Add A Payment in {0}</Typography>
                 <TextField
+                    className={classes.inputs}
                     label={`Payment Month`}
                     value={paymentDetails.month}
                     type="number"
@@ -71,6 +119,7 @@ const SubsequentPayment = (props) => {
                 />
                 <br/>
                <TextField
+                    className={classes.inputs}
                     label={`Payment Amount`}
                     value={paymentDetails.amount}
                     type="number"
@@ -90,6 +139,7 @@ const SubsequentPayment = (props) => {
             <div>
                 <Typography>Add A Payment For Every Month</Typography>
                 <TextField
+                    className={classes.inputs}
                     label={`Payment Amount`}
                     value={paymentDetails.amount}
                     type="number"
@@ -100,6 +150,7 @@ const SubsequentPayment = (props) => {
                         setPaymentDetails({...paymentDetails, ['amount']: e.currentTarget.value, ['month']: ''})
                     }}
                 />
+                <div style={{ height: 68 }}></div>
             </div>
         )
     }
@@ -109,6 +160,7 @@ const SubsequentPayment = (props) => {
             <div>
                 <Typography>Add A Payment Every Year in a Month</Typography>
                 <TextField
+                    className={classes.inputs}
                     label={`Payment Month`}
                     value={paymentDetails.month}
                     type="number"
@@ -121,6 +173,7 @@ const SubsequentPayment = (props) => {
                 />
                 <br />
                 <TextField
+                    className={classes.inputs}
                     label={`Payment Amount`}
                     value={paymentDetails.amount}
                     type="number"
@@ -155,33 +208,43 @@ const SubsequentPayment = (props) => {
     }
     const annual = props.currentSubsequentPayments['YEARLY']
     return (
-        <div>
-            <div>
-                <Typography>Monthly: 
-                    {monthly ? <Chip label={`${monthly}`} onDelete={() => {handleDelete('MONTHLY')}} />: null}
-                </Typography>
+        <div className={classes.root}>
+            <div className={classes.paymentDisplay}>
+                <Typography className={classes.paymentDisplayTitle}>Monthly </Typography>
+                <div className={classes.chipsContainer}>
+                    {monthly ? <Chip color="secondary" label={`${monthly}`} onDelete={() => { handleDelete('MONTHLY') }} /> : null}
+                </div>
             </div>
-            <div>
-                <Typography>Annual: {Object.entries(annual).map(([month, value]) => {
-                    return(
-                        <Chip
-                            label={`${value} Every ${month}`}
-                            onDelete={() => {handleDelete('YEARLY',month)}}
-                        />
-                    )
-                })}</Typography>
+            <div className={classes.paymentDisplay}>
+                <Typography className={classes.paymentDisplayTitle}>Annual: </Typography>
+                <div className={classes.chipsContainer}>
+                    {Object.entries(annual).map(([month, value]) => {
+                        return (
+                            <Chip
+                                color="primary"
+                                label={`${value} Every ${month}`}
+                                onDelete={() => { handleDelete('YEARLY', month) }}
+                            />
+                        )
+                    })}
+                </div>
             </div>
 
             <Button
+                variant="contained"
                 onClick={() => { props.togglePaymentOpen() }}
+                className={classes.button}
+                color="secondary"
+                fullWidth
             >
             Add Payments
             </Button>
             <Dialog
                 open={props.paymentOpen}
                 disableBackdropClick
+                
             >
-                <DialogContent>
+                <DialogContent className={classes.dialog}>
                     <ToggleButtonGroup size="small" value={paymentType} exclusive
                         onChange={(e) => {
                             setPaymentType(e.currentTarget.value)
@@ -195,6 +258,9 @@ const SubsequentPayment = (props) => {
                     {inputDisplay()}
                     <br />
                     <Button
+                        fullWidth
+                        className={classes.button}
+                        variant="outlined"
                         onClick={() => {
                             resetState()
                             props.togglePaymentOpen()
@@ -203,6 +269,10 @@ const SubsequentPayment = (props) => {
                         Cancel
                     </Button>
                     <Button
+                        fullWidth
+                        variant="contained"
+                        color='primary'
+                        className={classes.button}
                         onClick={() => { handleSubmit() }}
                     >
                         Submit

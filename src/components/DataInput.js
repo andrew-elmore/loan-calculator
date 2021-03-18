@@ -1,7 +1,8 @@
 import React, { useReducer, useState } from 'react'
 import {
     Button,
-    TextField
+    TextField,
+    Typography
 } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -67,8 +68,25 @@ const reducer = (state, action) => {
 
 const useStyles = makeStyles({
     root: {
-        background: 'red'
+        background: 'white',
+        margin: '2%',
+        padding: '3%',
+        boxShadow: '1px 1px 5px grey',
+        alignItems: 'center',
+        display: 'inline-block',
     },
+    inputs: {
+        width: 300,
+        marginTop: 20
+    },
+    button: {
+        marginTop: 20,
+        borderRadius: 20,
+        boxShadow: '1px 1px 5px grey',
+    },
+    switch: {
+        background: '#e37263',
+    }
 });
 
 function DataInput(props) {
@@ -125,69 +143,79 @@ function DataInput(props) {
     }
 
     return (
-        <div>
+        <div className={classes.root}>
+            <div>
+                <Typography>Enter Your Loan Information</Typography>
+                <TextField
+                    className={classes.inputs}
+                    label="Loan Amount"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>
+                    }}
+                    value={state.loanAmount}
+                    onChange={(e) => { dispatch({ type: 'loanAmount', payload: e.currentTarget.value }) }}
+                    error={state.errors.loanAmount}
+                    helperText={state.errors.loanAmount?"Please Enter A Number":false}
+                />
 
-            <TextField
-                label="Loan Amount"
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>
-                }}
-                value={state.loanAmount}
-                onChange={(e) => { dispatch({ type: 'loanAmount', payload: e.currentTarget.value }) }}
-                error={state.errors.loanAmount}
-                helperText={state.errors.loanAmount?"Please Enter A Number":false}
-            />
+                <br />
 
-            <br />
+                <TextField
+                    className={classes.inputs}
+                    label="Interest Rate"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    InputProps={{
+                        endAdornment: <InputAdornment position="end">%</InputAdornment>
+                    }}
+                    value={state.interestRate}
+                    onChange={(e) => { dispatch({ type: 'interestRate', payload: e.currentTarget.value }) }}
+                    error={state.errors.interestRate}
+                    helperText={state.errors.interestRate ? "Please Enter A Number" : false}
+                />
 
-            <TextField
-                label="Interest Rate"
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                InputProps={{
-                    endAdornment: <InputAdornment position="end">%</InputAdornment>
-                }}
-                value={state.interestRate}
-                onChange={(e) => { dispatch({ type: 'interestRate', payload: e.currentTarget.value }) }}
-                error={state.errors.interestRate}
-                helperText={state.errors.interestRate ? "Please Enter A Number" : false}
-            />
+                <br />
 
-            <br />
 
-            <ToggleButtonGroup size="small" value={duration} exclusive onChange={(e) => {
-                setDuration(e.currentTarget.value)
-            }}>
-                <ToggleButton value="Months">Months</ToggleButton>
-                <ToggleButton value="Years">Years</ToggleButton>
-            </ToggleButtonGroup>
 
-            <br />
 
-            <TextField
-                label={`Loan term in ${duration}`}
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                value={loanTerm}
-                onChange={(e) => { dispatch({ type: `term${duration}`, payload: e.currentTarget.value }) }}
-                error={state.errors[`term${duration}`]}
-                helperText={state.errors[`term${duration}`] ? "Please Enter A Number" : false}
-            />
+                <TextField
+                    className={classes.inputs}
+                    label={`Loan term in ${duration}`}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    value={loanTerm}
+                    onChange={(e) => { dispatch({ type: `term${duration}`, payload: e.currentTarget.value }) }}
+                    error={state.errors[`term${duration}`]}
+                    helperText={state.errors[`term${duration}`] ? "Please Enter A Number" : false}
+                />
+                <br />
+                <ToggleButtonGroup  size="small" value={duration} exclusive onChange={(e) => {
+                    setDuration(e.currentTarget.value)
+                }}>
+                    <ToggleButton value="Months">Months</ToggleButton>
+                    <ToggleButton value="Years">Years</ToggleButton>
+                </ToggleButtonGroup>
 
-            <br />
+                <br />
 
-            <Button
-                onClick={() => { 
-                    handleSubmit()
-                }}
-            >
-                Submit
-            </Button>
+                <Button
+                    variant="contained"
+                    className={classes.button}
+                    color="primary"
+                    fullWidth
+                    onClick={() => { 
+                        handleSubmit()
+                    }}
+                >
+                    Submit
+                </Button>
+            </div>
         </div>
     );
 }

@@ -1,7 +1,5 @@
 import React, { useReducer, useState } from 'react'
 import {
-    Button,
-    TextField,
     Grid
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,8 +8,23 @@ import AdditionalPayments from './AdditionalPayments'
 
 const useStyles = makeStyles({
     root: {
-        background: 'red'
+        background: 'white',
+        margin: '2%',
+        marginTop: '0',
+        padding: '3%',
+        boxShadow: '1px 1px 5px grey',
+        alignItems: 'center',
+        display: 'block',
+        height: '100%',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
     },
+    header: {
+        background: 'grey',
+        color: 'white',
+        padding: 20,
+        marginBottom: 10
+    }
 });
 
 const PaymentSchedule = (props) => {
@@ -30,6 +43,9 @@ const PaymentSchedule = (props) => {
         setSubsequentPayments(props.subsequentPayments)
     }
 
+    if (!props.inputData.loanAmount) { return null }
+
+
     
     let originalPrincipal = inputData.loanAmount
     let principal = originalPrincipal
@@ -39,7 +55,7 @@ const PaymentSchedule = (props) => {
     let months = []
     
     let i = 0 
-    while (i < numMonths || principal > 0) {
+    while (i < numMonths || Math.floor(principal) > 0) {
         let mothlyPayment = (originalPrincipal * monthlyRate * ((1 + monthlyRate) ** numMonths)) / (((1 + monthlyRate) ** numMonths) - 1)
         let additionalPayments = parseFloat(subsequentPayments['MONTHLY'])
         let aditionalPaymentsComponents = {}
@@ -102,14 +118,13 @@ const PaymentSchedule = (props) => {
     }
 
 
-    if (!props.inputData) { return null }
 
 
     
     return (
-        <div>
+        <div className={classes.root}>
             <Grid container spacing={1}>
-                <Grid container item xs={12} spacing={1}>
+                <Grid className={classes.header} container item xs={12} spacing={1}>
                     <Grid container item xs={2} spacing={1}>
                         Month
                     </Grid>
@@ -131,21 +146,22 @@ const PaymentSchedule = (props) => {
                 </Grid>
                 {months.map((month) => {
                     const { numMonth, mothlyPayment, interestPayment, principalPayment, remainingPrincipal } = month
+                    const backgroundColor = numMonth % 2 ? 'white' : '#e3f1ff'
                     return (
-                        <Grid container item xs={12} spacing={1}>
-                            <Grid container item xs={2} spacing={1}>
+                        <Grid style={{backgroundColor, height: 50}} container item xs={12} spacing={1}>
+                            <Grid style={{ marginTop: 5}} container item xs={2} spacing={1}>
                                 {numMonth}
                             </Grid>
-                            <Grid container item xs={2} spacing={1}>
+                            <Grid style={{ marginTop: 5 }} container item xs={2} spacing={1}>
                                 {makeDollarAmount(mothlyPayment)}
                             </Grid>
-                            <Grid container item xs={2} spacing={1}>
+                            <Grid style={{ marginTop: 5 }} container item xs={2} spacing={1}>
                                 {makeDollarAmount(principalPayment)}
                             </Grid>
-                            <Grid container item xs={2} spacing={1}>
+                            <Grid style={{ marginTop: 5 }} container item xs={2} spacing={1}>
                                 {makeDollarAmount(interestPayment)}
                             </Grid>
-                            <Grid container item xs={2} spacing={1}>
+                            <Grid style={{ marginTop: 5 }} container item xs={2} spacing={1}>
                                 {makeDollarAmount(remainingPrincipal)}
                             </Grid>
                             <Grid container item xs={2} spacing={1}>
