@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react'
+import React, { useState } from 'react'
 import {
     Button,
     TextField,
@@ -10,7 +10,11 @@ import {
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
-
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 
 const useStyles = makeStyles({
     root: {
@@ -66,30 +70,49 @@ const useStyles = makeStyles({
 
 const SubsequentPayment = (props) => {
     const classes = useStyles();
+
+    const monthsToIdx = {}
+    const idxToMonths = {}
+    let i = 0
+    while (i < props.inputData.termMonths) {
+        let month = (props.inputData.startDate.getMonth() + i + 1) % 12 + 1
+        let year = Math.floor((i + 1) / 12) + props.inputData.startDate.getFullYear()
+        monthsToIdx[`${month}/${year}`] = i
+        idxToMonths[i] = `${month}/${year}`
+        i++
+    }
+
     const [paymentType, setPaymentType] = useState(props.paymentType || 'ONE_TIME')
     const [paymentDetails, setPaymentDetails] = useState({
-        month: props.paymentMonth || 0,
-        amount: 0
+        month: props.paymentMonth || null,
+        amount: null
     })
 
     if (!props.inputData.loanAmount) { return null }
 
     
-    if (paymentDetails.month !== props.paymentMonth && props.paymentMonth !== undefined){
-        setPaymentDetails({...paymentDetails, ['month']: props.paymentMonth})
-    }
+
+
+    // if (paymentDetails.month !== props.paymentMonth && props.paymentMonth !== undefined){
+    //     setPaymentDetails({ ...paymentDetails, ['month']: props.paymentMonth})
+    // }
+
+
+
     
     
     const resetState = () => {
         props.togglePaymentOpen()
         setPaymentType('ONE_TIME')
+        setPaymentDetails({
+            month: props.paymentMonth || null,
+            amount: null
+        })
     }
 
     const handleSubmit = () => {
-        console.log(paymentDetails)
         const {month, amount} = paymentDetails
 
-        console.log(month)
         props.addPayment(paymentType, {[month]: amount })
         resetState()
     }
@@ -103,20 +126,22 @@ const SubsequentPayment = (props) => {
     const oneTimeDisplay = () => {
         return (
             <div >
-                <Typography>Add A Payment in {0}</Typography>
-                <TextField
-                    className={classes.inputs}
-                    label={`Payment Month`}
-                    value={paymentDetails.month}
-                    type="number"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    onChange={(e) => {
-                        console.log(e.currentTarget.value)
-                        setPaymentDetails({ ['month']: e.currentTarget.value })
-                    }}
-                />
+                <Typography>Add A Payment in a Month</Typography>
+                <FormControl className={classes.inputs}>
+                    <InputLabel id="simple-select-label">Month</InputLabel>
+                    <Select
+                        id="simple-select"
+                        value={paymentDetails.month}
+                        onChange={(e) => {
+                            setPaymentDetails({ ['month']: e.target.value})
+
+                        }}
+                    >
+                        {Object.entries(monthsToIdx).map(([date, idx]) => {
+                            return <MenuItem value={idx}>{date}</MenuItem>
+                        })}
+                    </Select>
+                </FormControl>
                 <br/>
                <TextField
                     className={classes.inputs}
@@ -159,18 +184,30 @@ const SubsequentPayment = (props) => {
         return (
             <div>
                 <Typography>Add A Payment Every Year in a Month</Typography>
-                <TextField
-                    className={classes.inputs}
-                    label={`Payment Month`}
-                    value={paymentDetails.month}
-                    type="number"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    onChange={(e) => {
-                        setPaymentDetails({ ...paymentDetails, ['month']: e.currentTarget.value })
-                    }}
-                />
+                <FormControl className={classes.inputs}>
+                    <InputLabel id="simple-select-label">Month</InputLabel>
+                    <Select
+                        id="simple-select"
+                        value={paymentDetails.month}
+                        onChange={(e) => {
+                            setPaymentDetails({ ['month']: e.target.value })
+
+                        }}
+                    >
+                        <MenuItem value={1}>Jan</MenuItem>
+                        <MenuItem value={2}>Feb</MenuItem>
+                        <MenuItem value={3}>Mar</MenuItem>
+                        <MenuItem value={4}>Apr</MenuItem>
+                        <MenuItem value={5}>May</MenuItem>
+                        <MenuItem value={6}>Jun</MenuItem>
+                        <MenuItem value={7}>Jul</MenuItem>
+                        <MenuItem value={8}>Aug</MenuItem>
+                        <MenuItem value={9}>Sep</MenuItem>
+                        <MenuItem value={10}>Oct</MenuItem>
+                        <MenuItem value={11}>Nov</MenuItem>
+                        <MenuItem value={12}>Dec</MenuItem>
+                    </Select>
+                </FormControl>
                 <br />
                 <TextField
                     className={classes.inputs}
@@ -188,16 +225,30 @@ const SubsequentPayment = (props) => {
         )
     }
 
+    const idxToMonth = {
+        1: 'Jan',
+        2: 'Feb',
+        3: 'Mar',
+        4: 'Apr',
+        5: 'May',
+        6: 'Jun',
+        7: 'Jul',
+        8: 'Aug',
+        9: 'Sep',
+        10: 'Oct',
+        11: 'Nov',
+        12: 'Dec',
+    }
 
 
 
     const inputDisplay = () => {
         if (paymentType === 'ONE_TIME') {
-            return oneTimeDisplay()
+            return oneTimeDisplay(monthsToIdx, idxToMonths)
         } else if (paymentType === 'MONTHLY') {
             return monthlyDisplay()
         } else {
-            return yearlyDisplay()
+            return yearlyDisplay(monthsToIdx, idxToMonths)
         }
     }
 
@@ -222,7 +273,7 @@ const SubsequentPayment = (props) => {
                         return (
                             <Chip
                                 color="primary"
-                                label={`${value} Every ${month}`}
+                                label={`${value} Every ${idxToMonth[month]}`}
                                 onDelete={() => { handleDelete('YEARLY', month) }}
                             />
                         )

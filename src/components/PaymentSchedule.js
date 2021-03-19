@@ -47,42 +47,6 @@ const PaymentSchedule = (props) => {
 
 
     
-    let originalPrincipal = inputData.loanAmount
-    let principal = originalPrincipal
-    let rate = inputData.interestRate / 100
-    let numMonths = inputData.termMonths
-    let monthlyRate = rate / 12
-    let months = []
-    
-    let i = 0 
-    while (i < numMonths || Math.floor(principal) > 0) {
-        let mothlyPayment = (originalPrincipal * monthlyRate * ((1 + monthlyRate) ** numMonths)) / (((1 + monthlyRate) ** numMonths) - 1)
-        let additionalPayments = parseFloat(subsequentPayments['MONTHLY'])
-        let aditionalPaymentsComponents = {}
-        if (parseFloat(subsequentPayments['MONTHLY']) > 0){
-            aditionalPaymentsComponents = { ['MONTHLY']: parseFloat(subsequentPayments['MONTHLY'])}
-        }
-        if (subsequentPayments['ONE_TIME'][i]){
-            additionalPayments += parseFloat(subsequentPayments['ONE_TIME'][i])
-            aditionalPaymentsComponents['ONE_TIME'] = parseFloat(subsequentPayments['ONE_TIME'][i])
-        }
-        
-        if (subsequentPayments['YEARLY'][(i % 12)]){
-            additionalPayments += parseFloat(subsequentPayments['YEARLY'][(i % 12)])
-            aditionalPaymentsComponents['YEARLY'] = parseFloat(subsequentPayments['YEARLY'][i%12])
-        }
-        
-        mothlyPayment += additionalPayments
-        
-        mothlyPayment = Math.min(principal * (1 + monthlyRate), mothlyPayment)
-
-        let interestPayment = (principal * monthlyRate) 
-        let principalPayment = (mothlyPayment - interestPayment)
-        let remainingPrincipal = (principal - principalPayment)
-        principal = remainingPrincipal
-        months.push({ numMonth: i, mothlyPayment, interestPayment, principalPayment, remainingPrincipal, additionalPayments, aditionalPaymentsComponents})
-        i ++
-    }
 
     const makeDollarAmount = (num) => {
         let roundedNum =Math.round(num * 100)
@@ -144,13 +108,13 @@ const PaymentSchedule = (props) => {
                         Additional Payments
                     </Grid>
                 </Grid>
-                {months.map((month) => {
-                    const { numMonth, mothlyPayment, interestPayment, principalPayment, remainingPrincipal } = month
+                {props.schedule.map((month) => {
+                    const { currentDate, numMonth, mothlyPayment, interestPayment, principalPayment, remainingPrincipal } = month
                     const backgroundColor = numMonth % 2 ? 'white' : '#e3f1ff'
                     return (
                         <Grid style={{backgroundColor, height: 50}} container item xs={12} spacing={1}>
                             <Grid style={{ marginTop: 5}} container item xs={2} spacing={1}>
-                                {numMonth}
+                                {currentDate.getMonth() + 1}/{currentDate.getYear()-100}
                             </Grid>
                             <Grid style={{ marginTop: 5 }} container item xs={2} spacing={1}>
                                 {makeDollarAmount(mothlyPayment)}

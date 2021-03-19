@@ -8,6 +8,12 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
+import {
+    MuiPickersUtilsProvider,
+    KeyboardDatePicker,
+} from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
+
 
 
 
@@ -22,6 +28,13 @@ const reducer = (state, action) => {
                 return currentState
             }
 
+            currentState[action.type] = action.payload
+            return currentState
+        case 'date':
+            if (action.payload === '') {
+                currentState[action.type] = null
+                return currentState
+            }
             currentState[action.type] = action.payload
             return currentState
 
@@ -60,7 +73,6 @@ const reducer = (state, action) => {
             currentState['errors'] = action.payload
             return currentState
         case 'seeState':
-            console.log(state)
         default:
             return state
     }
@@ -96,11 +108,13 @@ function DataInput(props) {
         termYears: null,
         termMonths: null,
         interestRate: null,
+        date: new Date(Date.now()),
         errors: {
             loanAmount: false,
             termYears: false,
             termMonths: false,
-            interestRate: false
+            interestRate: false,
+            date: false
         }
     })
     const [duration, setDuration] = useState('Months')
@@ -118,6 +132,7 @@ function DataInput(props) {
             termYears: parseFloat(state.termYears),
             termMonths: parseFloat(state.termMonths),
             interestRate: parseFloat(state.interestRate),
+            startDate: state.date
         }
 
         let allValidated = true
@@ -203,6 +218,22 @@ function DataInput(props) {
                 </ToggleButtonGroup>
 
                 <br />
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <KeyboardDatePicker
+                        disableToolbar
+                        variant="inline"
+                        format="MM/dd/yyyy"
+                        margin="normal"
+                        id="date-picker-inline"
+                        label="Starting Date of Loan"
+                        value={state.date}
+                        onChange={(date) => { dispatch({ type: 'date', payload: date}) }}
+                        KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                        }}
+                    />
+                </MuiPickersUtilsProvider>
+                <br />
 
                 <Button
                     variant="contained"
@@ -219,5 +250,7 @@ function DataInput(props) {
         </div>
     );
 }
+
+
 
 export default DataInput;

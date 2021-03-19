@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import DataInput from './components/DataInput'
 import PaymentSchedule from './components/PaymentSchedule'
 import SubsequentPayment from './components/SubsequentPayment'
+import PaymentChart from './components/PaymentChart'
 
 const reducer = (state, action) => {
     Object.freeze(state)
@@ -22,29 +23,70 @@ const reducer = (state, action) => {
             }
             return currentState
         case 'REMOVE_ONE_TIME_PAYMENT':
-            console.log("REMOVE_ONE_TIME_PAYMENT", action.payload)
             delete currentState.subsequentPayments['ONE_TIME'][action.payload]
             return currentState
         case 'REMOVE_MONTHLY_PAYMENT':
-            console.log("REMOVE_MONTHLY_PAYMENT")
             currentState.subsequentPayments['MONTHLY'] = 0
             return currentState
         case 'REMOVE_YEARLY_PAYMENT':
-            console.log("REMOVE_YEARLY_PAYMENT", action.payload)
             delete currentState.subsequentPayments['YEARLY'][action.payload]
             return currentState
-        case 'seeState':
-            console.log(state)
         default:
             return state
     }
 }
 
+const generateSchedule = (inputData, subsequentPayments) => {
+    let originalPrincipal = inputData.loanAmount
+    let principal = originalPrincipal
+    let rate = inputData.interestRate / 100
+    let numMonths = inputData.termMonths
+    let monthlyRate = rate / 12
+    let months = []
+    
+
+    let i = 0
+    while (i < numMonths || Math.floor(principal) > 0) {
+        let mothlyPayment = (originalPrincipal * monthlyRate * ((1 + monthlyRate) ** numMonths)) / (((1 + monthlyRate) ** numMonths) - 1)
+        let additionalPayments = parseFloat(subsequentPayments['MONTHLY'])
+        let aditionalPaymentsComponents = {}
+        if (parseFloat(subsequentPayments['MONTHLY']) > 0) {
+            aditionalPaymentsComponents = { ['MONTHLY']: parseFloat(subsequentPayments['MONTHLY']) }
+        }
+        if (subsequentPayments['ONE_TIME'][i]) {
+            additionalPayments += parseFloat(subsequentPayments['ONE_TIME'][i])
+            aditionalPaymentsComponents['ONE_TIME'] = parseFloat(subsequentPayments['ONE_TIME'][i])
+        }
+
+        if (subsequentPayments['YEARLY'][(i % 12)]) {
+            additionalPayments += parseFloat(subsequentPayments['YEARLY'][(i % 12)])
+            aditionalPaymentsComponents['YEARLY'] = parseFloat(subsequentPayments['YEARLY'][i % 12])
+        }
+
+        mothlyPayment += additionalPayments
+
+        mothlyPayment = Math.min(principal * (1 + monthlyRate), mothlyPayment)
+
+        let interestPayment = (principal * monthlyRate)
+        let principalPayment = (mothlyPayment - interestPayment)
+        let remainingPrincipal = (principal - principalPayment)
+        principal = remainingPrincipal
+
+        let currentDate = new Date(inputData.startDate)
+        
+        currentDate.setMonth((inputData.startDate.getMonth() + (i+ 1))%12)
+        currentDate.setFullYear(inputData.startDate.getFullYear() + Math.floor((inputData.startDate.getMonth() + i+1)/ 12))
+        months.push({ currentDate, numMonth: i, mothlyPayment, interestPayment, principalPayment, remainingPrincipal, additionalPayments, aditionalPaymentsComponents })
+        i++
+    }
+    return months
+}
+
+
 
 const useStyles = makeStyles({
     root: {
         background: '#eef7ef',
-        height: '100%'
     },
 });
 
@@ -70,6 +112,8 @@ function DebtCalculator() {
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [paymentMonth, setPaymentMonth] = useState(undefined)
     const [paymentType, setPaymentType] = useState(undefined)
+
+
 
     const submitDataInput = (data, durationType) => {
         dispatch({ type: 'CREATE_LOAN', payload: { data, durationType } })
@@ -97,6 +141,9 @@ function DebtCalculator() {
         }
     }
 
+    const schedule = generateSchedule(state.inputData, state.subsequentPayments)
+    
+    
 
 
 
@@ -109,12 +156,16 @@ function DebtCalculator() {
         setPaymentOpen(true)
     }
 
+    
+
 
     return (
         <div className={classes.root}>
-            {/* <button onClick={() => {console.log(state)}}>state</button> */}
             <DataInput
                 submitDataInput={submitDataInput}
+            />
+            <PaymentChart
+                schedule={schedule}
             />
             <SubsequentPayment
                 inputData={state.inputData}
@@ -131,6 +182,7 @@ function DebtCalculator() {
                 subsequentPayments={state.subsequentPayments}
                 openPaymentToMonth={openPaymentToMonth}
                 deleteSubesquentPayment={deleteSubesquentPayment}
+                schedule={schedule}
             />
 
         </div>
