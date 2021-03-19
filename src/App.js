@@ -1,7 +1,6 @@
-import React, {useReducer, useState} from 'react'
+import React from 'react'
 import DebtCalculator from './DebtCalculator'
 import { MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles'
-import { red, blue, deepOrange, indigo} from '@material-ui/core/colors'
 
 
 function App() {

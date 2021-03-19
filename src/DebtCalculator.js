@@ -111,7 +111,6 @@ function DebtCalculator() {
     })
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [paymentMonth, setPaymentMonth] = useState(undefined)
-    const [paymentType, setPaymentType] = useState(undefined)
 
 
 
@@ -126,7 +125,6 @@ function DebtCalculator() {
     const togglePaymentOpen = () => {
         if (paymentOpen) {
             setPaymentMonth(undefined)
-            setPaymentType(undefined)
         }
         setPaymentOpen(!paymentOpen)
     }
@@ -152,7 +150,6 @@ function DebtCalculator() {
 
     const openPaymentToMonth = (paymentMonth) => {
         setPaymentMonth(paymentMonth)
-        setPaymentType('ONE_TIME')
         setPaymentOpen(true)
     }
 

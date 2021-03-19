@@ -1,21 +1,11 @@
-import React, { useReducer, useState } from 'react'
+import React from 'react'
 import {
     IconButton,
     Chip
 } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import { makeStyles } from '@material-ui/core/styles';
-
-
-const useStyles = makeStyles({
-    root: {
-        background: 'red'
-    },
-});
-
 
 const AdditionalPayments = (props) => {
-    const classes = useStyles();
 
     const payments = props.month.aditionalPaymentsComponents
     const handleDelete = () => {
@@ -36,6 +26,7 @@ const AdditionalPayments = (props) => {
                 if (type === 'ONE_TIME'){
                     return( 
                         <Chip
+                            key={`${type}-${value}`}
                             style={{margin: 1}}
                             label={value}
                             onDelete={handleDelete}
@@ -44,6 +35,7 @@ const AdditionalPayments = (props) => {
                 } else if (type ==='MONTHLY'){
                     return (
                         <Chip
+                            key={`${type}-${value}`}
                             style={{ margin: 1 }}
                             color="secondary"
                             label={value}
@@ -53,6 +45,7 @@ const AdditionalPayments = (props) => {
                 } else {
                     return (
                         <Chip
+                            key={`${type}-${value}`}
                             style={{ margin: 1 }}
                             color="primary"
                             label={value}

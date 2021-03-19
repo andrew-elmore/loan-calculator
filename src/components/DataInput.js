@@ -24,7 +24,7 @@ const reducer = (state, action) => {
     switch (action.type) {
         case 'loanAmount':
             if (action.payload === '') {
-                currentState[action.type] = null
+                currentState[action.type] = ''
                 return currentState
             }
 
@@ -32,7 +32,7 @@ const reducer = (state, action) => {
             return currentState
         case 'date':
             if (action.payload === '') {
-                currentState[action.type] = null
+                currentState[action.type] = ''
                 return currentState
             }
             currentState[action.type] = action.payload
@@ -40,7 +40,7 @@ const reducer = (state, action) => {
 
         case 'interestRate':
             if (action.payload === '') {
-                currentState[action.type] = null
+                currentState[action.type] = ''
                 return currentState
             }
 
@@ -49,8 +49,8 @@ const reducer = (state, action) => {
 
         case 'termYears':
             if (action.payload === ''){
-                currentState['termYears'] = null
-                currentState['termMonths'] = null
+                currentState['termYears'] = ''
+                currentState['termMonths'] = ''
                 return currentState
             }
             newValue = parseFloat(action.payload)
@@ -60,8 +60,8 @@ const reducer = (state, action) => {
 
         case 'termMonths':
             if (action.payload === '') {
-                currentState['termYears'] = null
-                currentState['termMonths'] = null
+                currentState['termYears'] = ''
+                currentState['termMonths'] = ''
                 return currentState
             }
             newValue = parseFloat(action.payload)
@@ -104,10 +104,10 @@ const useStyles = makeStyles({
 function DataInput(props) {
     const classes = useStyles();
     const [state, dispatch] = useReducer(reducer, {
-        loanAmount: null,
-        termYears: null,
-        termMonths: null,
-        interestRate: null,
+        loanAmount: '',
+        termYears: '',
+        termMonths: '',
+        interestRate: '',
         date: new Date(Date.now()),
         errors: {
             loanAmount: false,

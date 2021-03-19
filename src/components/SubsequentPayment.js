@@ -12,7 +12,6 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
@@ -26,11 +25,6 @@ const useStyles = makeStyles({
         alignItems: 'center',
         display: 'block',
         height: '100%'
-    },
-    button: {
-        marginTop: 20,
-        borderRadius: 20,
-        boxShadow: '1px 1px 5px grey',
     },
     paymentDisplay: {
         margin: '0.5%',
@@ -84,18 +78,14 @@ const SubsequentPayment = (props) => {
 
     const [paymentType, setPaymentType] = useState(props.paymentType || 'ONE_TIME')
     const [paymentDetails, setPaymentDetails] = useState({
-        month: props.paymentMonth || null,
-        amount: null
+        month: props.paymentMonth || '',
+        amount: ''
     })
 
     if (!props.inputData.loanAmount) { return null }
 
     
 
-
-    // if (paymentDetails.month !== props.paymentMonth && props.paymentMonth !== undefined){
-    //     setPaymentDetails({ ...paymentDetails, ['month']: props.paymentMonth})
-    // }
 
 
 
@@ -105,8 +95,8 @@ const SubsequentPayment = (props) => {
         props.togglePaymentOpen()
         setPaymentType('ONE_TIME')
         setPaymentDetails({
-            month: props.paymentMonth || null,
-            amount: null
+            month: props.paymentMonth || '',
+            amount: ''
         })
     }
 
@@ -138,7 +128,7 @@ const SubsequentPayment = (props) => {
                         }}
                     >
                         {Object.entries(monthsToIdx).map(([date, idx]) => {
-                            return <MenuItem value={idx}>{date}</MenuItem>
+                            return <MenuItem key={`${idx}`} value={idx}>{date}</MenuItem>
                         })}
                     </Select>
                 </FormControl>
@@ -252,7 +242,7 @@ const SubsequentPayment = (props) => {
         }
     }
 
-    let monthly = null
+    let monthly = ''
     if ( props.currentSubsequentPayments['MONTHLY'] > 0 ){
         monthly = props.currentSubsequentPayments['MONTHLY']
 
@@ -263,7 +253,7 @@ const SubsequentPayment = (props) => {
             <div className={classes.paymentDisplay}>
                 <Typography className={classes.paymentDisplayTitle}>Monthly </Typography>
                 <div className={classes.chipsContainer}>
-                    {monthly ? <Chip color="secondary" label={`${monthly}`} onDelete={() => { handleDelete('MONTHLY') }} /> : null}
+                    {monthly ? <Chip color="secondary" label={`${monthly}`} onDelete={() => { handleDelete('MONTHLY') }} /> : ''}
                 </div>
             </div>
             <div className={classes.paymentDisplay}>
@@ -272,6 +262,7 @@ const SubsequentPayment = (props) => {
                     {Object.entries(annual).map(([month, value]) => {
                         return (
                             <Chip
+                                key={`${month}`}
                                 color="primary"
                                 label={`${value} Every ${idxToMonth[month]}`}
                                 onDelete={() => { handleDelete('YEARLY', month) }}

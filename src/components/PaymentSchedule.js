@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react'
+import React, { useState } from 'react'
 import {
     Grid
 } from '@material-ui/core';
@@ -112,7 +112,7 @@ const PaymentSchedule = (props) => {
                     const { currentDate, numMonth, mothlyPayment, interestPayment, principalPayment, remainingPrincipal } = month
                     const backgroundColor = numMonth % 2 ? 'white' : '#e3f1ff'
                     return (
-                        <Grid style={{backgroundColor, height: 50}} container item xs={12} spacing={1}>
+                        <Grid key={`${currentDate}`} style={{backgroundColor, height: 50}} container item xs={12} spacing={1}>
                             <Grid style={{ marginTop: 5}} container item xs={2} spacing={1}>
                                 {currentDate.getMonth() + 1}/{currentDate.getYear()-100}
                             </Grid>

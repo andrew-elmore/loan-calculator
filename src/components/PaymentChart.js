@@ -52,11 +52,6 @@ const PaymentChart = (props) => {
         runningTotalInterest.push(Math.floor(totalInterest))
     })
 
-
-    
-
-
-    const theData = remainingPrincipal
     const data = {
         labels: labels,
         datasets: [
