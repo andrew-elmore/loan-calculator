@@ -98,6 +98,14 @@ const useStyles = makeStyles({
     },
     switch: {
         background: '#e37263',
+    },
+    heading: {
+        textAlign: 'center',
+        color: '#4a4a4a',
+        fontFamily: 'sofia-pro',
+        fontWeight: '600',
+        fontStyle: 'normal',
+        fontSize: '25px',
     }
 });
 
@@ -160,7 +168,7 @@ function DataInput(props) {
     return (
         <div className={classes.root}>
             <div>
-                <Typography>Enter Your Loan Information</Typography>
+                <Typography className={classes.heading}>Enter Your Loan Information</Typography>
                 <TextField
                     className={classes.inputs}
                     label="Loan Amount"

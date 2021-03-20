@@ -30,6 +30,7 @@ const AdditionalPayments = (props) => {
                             style={{margin: 1}}
                             label={value}
                             onDelete={handleDelete}
+                            style={{ backgroundColor: 'rgb(94, 174, 156)', color: 'white' }}
                         />
                     )
                 } else if (type ==='MONTHLY'){

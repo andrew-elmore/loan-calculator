@@ -33,11 +33,9 @@ const PaymentSchedule = (props) => {
     const [inputData, setInputData] = useState(props.inputData)
     const [subsequentPayments, setSubsequentPayments] = useState(props.subsequentPayments)
 
-
     if (props.inputData !== inputData){
         setInputData(props.inputData)
     }
-
 
     if (props.subsequentPayments !== subsequentPayments){
         setSubsequentPayments(props.subsequentPayments)

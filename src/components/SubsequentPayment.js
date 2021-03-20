@@ -60,6 +60,15 @@ const useStyles = makeStyles({
         borderRadius: 20,
         boxShadow: '1px 1px 5px grey',
     },
+    heading: {
+        // textAlign: 'center',
+        color: '#4a4a4a',
+        fontFamily: 'sofia-pro',
+        fontWeight: '600',
+        fontStyle: 'normal',
+        marginTop: 5,
+        fontSize: '20px',
+    },
 });
 
 const SubsequentPayment = (props) => {
@@ -82,14 +91,9 @@ const SubsequentPayment = (props) => {
         amount: ''
     })
 
+    const idxToMonth = { 1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec', }
+
     if (!props.inputData.loanAmount) { return null }
-
-    
-
-
-
-
-    
     
     const resetState = () => {
         props.togglePaymentOpen()
@@ -215,22 +219,6 @@ const SubsequentPayment = (props) => {
         )
     }
 
-    const idxToMonth = {
-        1: 'Jan',
-        2: 'Feb',
-        3: 'Mar',
-        4: 'Apr',
-        5: 'May',
-        6: 'Jun',
-        7: 'Jul',
-        8: 'Aug',
-        9: 'Sep',
-        10: 'Oct',
-        11: 'Nov',
-        12: 'Dec',
-    }
-
-
 
     const inputDisplay = () => {
         if (paymentType === 'ONE_TIME') {
@@ -271,6 +259,7 @@ const SubsequentPayment = (props) => {
                     })}
                 </div>
             </div>
+            <Typography className={classes.heading}>Want to pay off your loan faster? Click below to add an additional One Time, Monthly, or Annual payment! </Typography>
 
             <Button
                 variant="contained"
